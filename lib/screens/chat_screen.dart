@@ -80,9 +80,8 @@ class _ChatScreenState extends State<ChatScreen>{
                     }
                   ),
                 ),
-          ),            
-
-          
+          ), 
+                    
           Row(               
             children:[
               Expanded(child: 

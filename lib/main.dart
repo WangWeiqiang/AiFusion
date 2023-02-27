@@ -1,5 +1,7 @@
+import 'package:aifusion/constants/constants.dart';
 import 'package:aifusion/screens/chat_screen.dart';
 import 'package:aifusion/screens/paint_screen.dart';
+import 'package:aifusion/services/services.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:aifusion/models/AiChatMessageModel.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class AiFusionApp extends StatelessWidget {
   Widget build(BuildContext context){
     return MaterialApp(
       title: 'Ai Fusion',
-      home: new AiHomePage(),
+      home: AiHomePage(),
     );
   }
 }
@@ -47,6 +49,14 @@ class _AiHomePageState extends State<AiHomePage>{
               ],
             ),
             title: const Text('Ai Fusion'),
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  await Services.showModalSheet(context: context);
+                },
+                icon: Icon(Icons.more_vert_rounded,)
+              )
+            ],
           ),
           body: const TabBarView(
             physics: NeverScrollableScrollPhysics(),

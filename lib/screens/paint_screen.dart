@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PaintScreen extends StatefulWidget{
@@ -10,7 +9,7 @@ class PaintScreen extends StatefulWidget{
 class _PaintScreen extends State<PaintScreen>{
   @override
   Widget build(BuildContext context) {
-    return Icon(Icons.format_paint_rounded);
+    return const Icon(Icons.format_paint_rounded);
     
   }
 }

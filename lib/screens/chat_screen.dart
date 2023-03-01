@@ -1,8 +1,13 @@
+import 'dart:developer';
+
+import 'package:aifusion/providers/model_provider.dart';
+import 'package:aifusion/services/api_service.dart';
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/AiChatMessageModel.dart';
-import '../services/assets_manager.dart';
+
 
 List<AiChatMessage> messages=[
   AiChatMessage(messageContent: "Hello, Will you come to my house today?",messageType: "reciever"),
@@ -26,6 +31,7 @@ class ChatScreen extends StatefulWidget{
 class _ChatScreenState extends State<ChatScreen>{
   @override
   Widget build(BuildContext context){
+    final modelProvider = Provider.of<ModelsProvider>(context);
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child:Column(
@@ -81,12 +87,12 @@ class _ChatScreenState extends State<ChatScreen>{
                   ),
                 ),
           ), 
-                    
+
           Row(               
             children:[
               Expanded(child: 
                 TextField(
-                  decoration: InputDecoration(labelText: 'Say something'),
+                  decoration: const InputDecoration(labelText: 'Say something'),
                   onChanged: (String newText){
                     if(newText.isNotEmpty){
                       sendNewText=newText;
@@ -96,7 +102,16 @@ class _ChatScreenState extends State<ChatScreen>{
                 ) 
               ),
               const SizedBox(width: 15,),
-              IconButton(onPressed: (){}, icon: const Icon(Icons.send))
+              IconButton(onPressed: () async {
+                try{
+                  log(sendNewText);
+                  log(modelProvider.currentModel);
+                  await ApiService.sendMessage(message: sendNewText, modelId: modelProvider.currentModel);
+                }
+                catch(error){
+                  log("error $error");
+                }
+              }, icon: const Icon(Icons.send))
             ],
             
           )

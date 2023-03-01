@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class AiChatMessage{
   String messageContent;
   String messageType;

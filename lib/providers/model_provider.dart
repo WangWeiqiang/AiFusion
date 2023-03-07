@@ -1,36 +1,30 @@
-import 'package:aifusion/models/models_model.dart';
-import 'package:aifusion/services/api_service.dart';
-import 'package:flutter/material.dart';
 
-class ModelsProvider with ChangeNotifier{
+import 'package:flutter/cupertino.dart';
+
+import '../models/models_model.dart';
+import '../services/api_service.dart';
+
+class ModelsProvider with ChangeNotifier {
+  // String currentModel = "text-davinci-003";
+  String currentModel = "gpt-3.5-turbo-0301";
   
-  
-  String currentModel="text-davinci-003";
-
-
-  String get getCurrentModel{
+  String get getCurrentModel {
     return currentModel;
   }
 
-
-  void setCurrentModel(String newModel){
-    currentModel=newModel;
+  void setCurrentModel(String newModel) {
+    currentModel = newModel;
     notifyListeners();
   }
 
+  List<ModelsModel> modelsList = [];
 
-  List<ModelsModel> modelsList=[];
-
-  List<ModelsModel> get getModelList{
+  List<ModelsModel> get getModelsList {
     return modelsList;
   }
 
-  Future<List<ModelsModel>> getModelsList() async{
-    if(modelsList.isEmpty) {
-      modelsList = await ApiService.getModels();
-    }
+  Future<List<ModelsModel>> getAllModels() async {
+    modelsList = await ApiService.getModels();
     return modelsList;
   }
-
-
 }

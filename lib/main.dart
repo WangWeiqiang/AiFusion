@@ -1,87 +1,73 @@
 import 'package:aifusion/providers/model_provider.dart';
+import 'package:aifusion/providers/txt2img_provider.dart';
 import 'package:aifusion/screens/chat_screen.dart';
 import 'package:aifusion/screens/paint_screen.dart';
+import 'package:aifusion/screens/stability_screen.dart';
+import 'package:aifusion/screens/supper_resolution_screen.dart';
 import 'package:aifusion/services/services.dart';
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
-import 'package:aifusion/models/AiChatMessageModel.dart';
+import 'package:aifusion/widgets/text_widget.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'constants/constants.dart';
+import 'providers/chats_provider.dart';
+
 
 void main() {
-  runApp(const AiFusionApp());
+  runApp(const MyApp());
 }
 
-class AiFusionApp extends StatelessWidget {
-  const AiFusionApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  
-  @override
-  Widget build(BuildContext context){
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_)=>ModelsProvider(),
-        )
-      ],
-      child: MaterialApp(
-      title: 'Ai Fusion',
-      home: AiHomePage(),
-    ));
-  }
-}
-
-class AiHomePage extends StatefulWidget{
-  @override
-  _AiHomePageState createState()=> _AiHomePageState();
-}
-
-class _AiHomePageState extends State<AiHomePage>{
-
-  late OpenAI openAI;
-  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child:DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            bottom: const TabBar(
+    
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ModelsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChatProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => Txt2ImgProvider()
+        )
+      ],
+      child: MaterialApp(
+        title: 'Flutter ChatBOT',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+            scaffoldBackgroundColor: scaffoldBackgroundColor,
+            appBarTheme: AppBarTheme(
+              color: cardColor,
+            )),
+        home: DefaultTabController(
+          length: 4,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const TextWidget(label: 'Ai Fusion'),
               
-              tabs: [
-                Tab(icon: Icon(Icons.chat)),
-                Tab(icon: Icon(Icons.draw)),
-                Tab(icon:Icon(Icons.play_circle))
-              ],
+              bottom: const TabBar(
+                tabs: [
+                  Tab(icon:Icon(Icons.chat)),
+                  Tab(icon:Icon(Icons.image)),
+                  Tab(icon: Icon(Icons.scale_sharp)),
+                  Tab(icon:Icon(Icons.play_arrow))
+                ]
+              ),
             ),
-            title: const Text('Ai Fusion'),
-            actions: [
-              IconButton(
-                onPressed: () async {
-                  await Services.showModalSheet(context: context);
-                },
-                icon: const Icon(Icons.more_vert_rounded,)
-              )
-            ],
-          ),
-          body: const TabBarView(
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              ChatScreen(),
-              PaintScreen(),
-              Icon(Icons.play_circle)
-            ]
-          ),
-          floatingActionButton: FloatingActionButton(
-                    child: const Icon(Icons.send),
-                    onPressed: (){
-                      setState((){
-                        messages.add(AiChatMessage(messageContent: sendNewText, messageType:'receiver'));
-                        
-                      });
-                    }
+            body: const TabBarView(
+              children: [
+                ChatScreen(),
+                SingleImagePage(),
+                SupperResolutionPage(),
+                Icon(Icons.play_arrow)
+              ],
+            ) ,
           ),
         ),
       ),

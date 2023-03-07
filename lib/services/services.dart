@@ -1,7 +1,7 @@
-import 'package:aifusion/widgets/drop_down.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/constants.dart';
+import '../widgets/drop_down.dart';
 
 class Services{
   static Future<void> showModalSheet({required BuildContext context}) async{
@@ -23,7 +23,7 @@ class Services{
               Flexible(
                 child: Text('Chosen Model:',)
               ),
-              Flexible(child: ModelsDropDownWidget()),
+              Flexible(child: ModelsDrowDownWidget()),
             ],
           )
         );

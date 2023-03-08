@@ -11,31 +11,57 @@ import '../models/chat_model.dart';
 
 
 class ReplicateService {
+
+  // Get pridication
+  static Future<String?> GetSuppResolutionResult({required String url}) async {
+    try{
+      var uri = Uri.parse(url);
+      var response = await http.get(
+          uri,
+          headers: {
+            'Authorization':"Token $REPLICATE_KEY"           
+          }
+        );
+
+      log(response.body);
+      var jsonResponse =convert.jsonDecode(response.body) as Map<String?, dynamic>;
+      
+      
+      return "";// jsonResponse['output'];
+    }
+    catch(error){
+      log("error: $error");
+    }
+  }
   // Send Message using ChatGPT API
-  static Future<String?> SupperResolution({required String modelType,required Stream imageFile}) async {
+  static Future<String?> SupperResolution({required String modelType,required String imageFile}) async {
     try {
       
-      var url = Uri.https("https://api.replicate.com/v1/predictions");
+      var url = Uri.parse("https://api.replicate.com/v1/predictions");
       var response = await http.post(
           url,
           headers: {
             'Authorization':"Token $REPLICATE_KEY",
-            'Content-Type': 'application/json',             
+            'Content-Type':'application/json',             
           },
-          body:{
+          body:jsonEncode({
             'version':'567785261e974455ede3b0644d1d7e5aa8d9e40a22217a8726900acdcd9e19ce',
             'input':{
               'image':imageFile
             }
-          });
+          })
+        );
 
-      var jsonResponse =convert.jsonDecode(response.body) as Map<String, dynamic>;
+      //log(response.body);
 
-      log(jsonResponse["type"]);
-      log(jsonResponse["title"]);
-      log(jsonResponse["format"]);
+      var jsonResponse =convert.jsonDecode(response.body) as Map<String?, dynamic>;
 
-      return "";
+      if(!jsonResponse["id"].isEmpty){
+        return await GetSuppResolutionResult(url: "https://api.replicate.com/v1/predictions/"+jsonResponse["id"]);
+        
+      }
+      else
+        return "";
 
     } catch (error) {
       log("error $error");

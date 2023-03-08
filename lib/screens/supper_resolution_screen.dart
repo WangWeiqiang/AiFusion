@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:aifusion/constants/api_constant.dart';
+import 'package:aifusion/services/replicate_service.dart';
 import 'package:cached_memory_image/cached_memory_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -27,6 +30,10 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
   late ScrollController _listScrollController;
 
   final ImagePicker _imagePicker=ImagePicker();
+
+  var _image;
+
+  final ReplicateService service = ReplicateService();
 
   @override
   void initState() {
@@ -63,7 +70,8 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
         child: Column(
           children: [
             Expanded(child: Center(
-              child: Image(image: AssetImage(AssetsManager.openaiLogo)),
+              child:_image!=null 
+                ?Image.file(_image) :Image(image: AssetImage(AssetsManager.openaiLogo)),
             )),
             if (_isTyping) ...[
               const SpinKitThreeBounce(
@@ -81,7 +89,22 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
                 child:TextButton(
                   onPressed: () async { 
                     final XFile? imgFile = await _imagePicker.pickImage(source: ImageSource.gallery);
-                    
+                    var base64Image;
+                    if(imgFile!=null){
+                      setState((){
+                        _image = File(imgFile.path);
+                        List<int> imageBytes = _image.readAsBytesSync();
+                        print(imageBytes);
+                        base64Image = base64Encode(imageBytes);
+                      });
+
+                      var result = await ReplicateService.SupperResolution(modelType: '', imageFile: base64Image);
+                      if(result!.isNotEmpty){
+                        setState(() {
+                          _image = File.fromUri(Uri.parse(result));
+                        });
+                      }
+                    }
                   }, 
                  child: Text('Choose a low resolution Image'),)
               ),

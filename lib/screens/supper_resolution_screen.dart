@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:ffi';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:aifusion/constants/api_constant.dart';
 import 'package:aifusion/services/replicate_service.dart';
@@ -31,7 +34,11 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
 
   final ImagePicker _imagePicker=ImagePicker();
 
-  var _image;
+  String _image='';
+
+  
+  
+  final Duration duration = Duration(seconds: 3);
 
   final ReplicateService service = ReplicateService();
 
@@ -70,10 +77,10 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
         child: Column(
           children: [
             Expanded(child: Center(
-              child:_image!=null 
-                ?Image.file(_image) :Image(image: AssetImage(AssetsManager.openaiLogo)),
+              child:_image.isEmpty? Image(image: AssetImage(AssetsManager.openaiLogo))
+              :(_image.contains('http')?Image.network(_image):Image.file(File(_image))),
             )),
-            if (_isTyping) ...[
+            if (isLoading) ...[
               const SpinKitThreeBounce(
                 color: Colors.white,
                 size: 18,
@@ -88,22 +95,40 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
                 padding: const EdgeInsets.all(2.0),
                 child:TextButton(
                   onPressed: () async { 
+                    Timer? _timer =null;
+                    int maxLoadTimes = 10;
                     final XFile? imgFile = await _imagePicker.pickImage(source: ImageSource.gallery);
-                    var base64Image;
+                    
+                    Uint8List imageBytes = await imgFile!.readAsBytes();
+                     
                     if(imgFile!=null){
+                      isLoading=true;
+
                       setState((){
-                        _image = File(imgFile.path);
-                        List<int> imageBytes = _image.readAsBytesSync();
-                        print(imageBytes);
-                        base64Image = base64Encode(imageBytes);
+                        _image = imgFile.path;
                       });
 
-                      var result = await ReplicateService.SupperResolution(modelType: '', imageFile: base64Image);
-                      if(result!.isNotEmpty){
-                        setState(() {
-                          _image = File.fromUri(Uri.parse(result));
-                        });
-                      }
+                      String? reqeustId = await ReplicateService.SupperResolution(modelType: '', fileName: imgFile.name, bodyBytes: imageBytes);
+
+                      _timer = Timer.periodic(duration, (timer) async { 
+                        var output = await ReplicateService.GetSuppResolutionResult(id: reqeustId!);
+                        log(maxLoadTimes.toString());
+                        if(output!=null){
+                          isLoading=false;
+                          _timer!.cancel();
+                          setState(() {
+                            _image = output;
+                          });
+                        }
+                        maxLoadTimes--;
+                        if(maxLoadTimes<0 && _timer!=null){
+                          setState(() {
+                            isLoading=false;
+                          });
+                          _timer!.cancel();
+                          log("wait for long time no response from replciate");
+                        }
+                      });
                     }
                   }, 
                  child: Text('Choose a low resolution Image'),)

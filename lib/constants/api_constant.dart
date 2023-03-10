@@ -6,3 +6,6 @@ String DREAM_STUDIO_URL="https://grpc.stability.ai";
 
 String REPLICATE_KEY="77e733e127eeb3fd2eb32d79964ab9bc6a6b45f9";
 
+String AZURE_STORAGE_CONN ="DefaultEndpointsProtocol=https;AccountName=neabisdevdiag;AccountKey=aT0TkFfbW73+0tqVD3/qfgQ4LffSvjpvxgfZ34l1o5EklmrIDg87eHe0Wu/WL+ZzPwVyEOiyw5FDWxySR7mQKw==;EndpointSuffix=core.windows.net";
+
+

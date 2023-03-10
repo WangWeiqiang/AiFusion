@@ -1,6 +1,8 @@
 import 'package:aifusion/providers/model_provider.dart';
 import 'package:aifusion/providers/txt2img_provider.dart';
 import 'package:aifusion/screens/chat_screen.dart';
+import 'package:aifusion/screens/drawing_canvas.dart';
+import 'package:aifusion/screens/drawing_screen.dart';
 import 'package:aifusion/screens/paint_screen.dart';
 import 'package:aifusion/screens/stability_screen.dart';
 import 'package:aifusion/screens/supper_resolution_screen.dart';
@@ -65,7 +67,7 @@ class MyApp extends StatelessWidget {
                 ChatScreen(),
                 SingleImagePage(),
                 SupperResolutionPage(),
-                Icon(Icons.play_arrow)
+                DrawingPage()
               ],
             ) ,
           ),

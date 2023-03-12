@@ -53,7 +53,7 @@ class CanvasSideBar extends HookWidget {
     final scrollController = useScrollController();
     return Container(
       width: 300,
-      height: MediaQuery.of(context).size.height < 680 ? 450 : 610,
+      height: 50 ,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
@@ -73,81 +73,7 @@ class CanvasSideBar extends HookWidget {
           padding: const EdgeInsets.all(10.0),
           controller: scrollController,
           children: [
-            const SizedBox(height: 10),
-            const Text(
-              'Shapes',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 5,
-              runSpacing: 5,
-              children: [
-                _IconBox(
-                  iconData: FontAwesomeIcons.pencil,
-                  selected: drawingMode.value == DrawingMode.pencil,
-                  onTap: () => drawingMode.value = DrawingMode.pencil,
-                  tooltip: 'Pencil',
-                ),
-                _IconBox(
-                  selected: drawingMode.value == DrawingMode.line,
-                  onTap: () => drawingMode.value = DrawingMode.line,
-                  tooltip: 'Line',
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 22,
-                        height: 2,
-                        color: drawingMode.value == DrawingMode.line
-                            ? Colors.grey[900]
-                            : Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-                _IconBox(
-                  iconData: Icons.hexagon_outlined,
-                  selected: drawingMode.value == DrawingMode.polygon,
-                  onTap: () => drawingMode.value = DrawingMode.polygon,
-                  tooltip: 'Polygon',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.eraser,
-                  selected: drawingMode.value == DrawingMode.eraser,
-                  onTap: () => drawingMode.value = DrawingMode.eraser,
-                  tooltip: 'Eraser',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.square,
-                  selected: drawingMode.value == DrawingMode.square,
-                  onTap: () => drawingMode.value = DrawingMode.square,
-                  tooltip: 'Square',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.circle,
-                  selected: drawingMode.value == DrawingMode.circle,
-                  onTap: () => drawingMode.value = DrawingMode.circle,
-                  tooltip: 'Circle',
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Text(
-                  'Fill Shape: ',
-                  style: TextStyle(fontSize: 12),
-                ),
-                Checkbox(
-                  value: filled.value,
-                  onChanged: (val) {
-                    filled.value = val ?? false;
-                  },
-                ),
-              ],
-            ),
+
 
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 150),
@@ -172,103 +98,10 @@ class CanvasSideBar extends HookWidget {
                     )
                   : const SizedBox.shrink(),
             ),
-            const SizedBox(height: 10),
-            const Text(
-              'Colors',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            ColorPalette(
-              selectedColor: selectedColor,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Size',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Row(
-              children: [
-                const Text(
-                  'Stroke Size: ',
-                  style: TextStyle(fontSize: 12),
-                ),
-                Slider(
-                  value: strokeSize.value,
-                  min: 0,
-                  max: 50,
-                  onChanged: (val) {
-                    strokeSize.value = val;
-                  },
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                const Text(
-                  'Eraser Size: ',
-                  style: TextStyle(fontSize: 12),
-                ),
-                Slider(
-                  value: eraserSize.value,
-                  min: 0,
-                  max: 80,
-                  onChanged: (val) {
-                    eraserSize.value = val;
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Actions',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Wrap(
-              children: [
-                TextButton(
-                  onPressed: allSketches.value.isNotEmpty
-                      ? () => undoRedoStack.value.undo()
-                      : null,
-                  child: const Text('Undo'),
-                ),
-                ValueListenableBuilder<bool>(
-                  valueListenable: undoRedoStack.value._canRedo,
-                  builder: (_, canRedo, __) {
-                    return TextButton(
-                      onPressed:
-                          canRedo ? () => undoRedoStack.value.redo() : null,
-                      child: const Text('Redo'),
-                    );
-                  },
-                ),
-                TextButton(
-                  child: const Text('Clear'),
-                  onPressed: () => undoRedoStack.value.clear(),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    if (backgroundImage.value != null) {
-                      backgroundImage.value = null;
-                    } else {
-                      backgroundImage.value = await _getImage;
-                    }
-                  },
-                  child: Text(
-                    backgroundImage.value == null
-                        ? 'Add Background'
-                        : 'Remove Background',
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Export',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
+
+           
+           
+           
             Row(
               children: [
                 SizedBox(
@@ -293,17 +126,7 @@ class CanvasSideBar extends HookWidget {
                 ),
               ],
             ),
-            // add about me button or follow buttons
-            const Divider(),
-            Center(
-              child: GestureDetector(
-                onTap: () => _launchUrl('https://github.com/JideGuru'),
-                child: const Text(
-                  'Made with 💙 by JideGuru',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
+            
           ],
         ),
       ),
@@ -413,9 +236,9 @@ class _IconBox extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: selected ? Colors.grey[900]! : Colors.grey,
-              width: 1.5,
+              width: 0.5,
             ),
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
           child: Tooltip(
             message: tooltip,

@@ -42,14 +42,12 @@ class DrawingCanvas extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.precise,
-      child: Stack(
+    return Stack(
         children: [
           buildAllSketches(context),
           buildCurrentPath(context),
         ],
-      ),
+      
     );
   }
 
@@ -99,27 +97,30 @@ class DrawingCanvas extends HookWidget {
   }
 
   Widget buildAllSketches(BuildContext context) {
-    return SizedBox(
-      height: height,
-      width: width,
-      child: ValueListenableBuilder<List<Sketch>>(
-        valueListenable: allSketches,
-        builder: (context, sketches, _) {
-          return RepaintBoundary(
-            key: canvasGlobalKey,
-            child: Container(
-              height: height,
-              width: width,
-              color: kCanvasColor,
-              child: CustomPaint(
-                painter: SketchPainter(
-                  sketches: sketches,
-                  backgroundImage: backgroundImage.value,
+    return MouseRegion(
+      cursor: SystemMouseCursors.precise,
+      child: SizedBox(
+        height: height,
+        width: width,
+        child: ValueListenableBuilder<List<Sketch>>(
+          valueListenable: allSketches,
+          builder: (context, sketches, _) {
+            return RepaintBoundary(
+              key: canvasGlobalKey,
+              child: Container(
+                height: height,
+                width: width,
+                color: kCanvasColor,
+                child: CustomPaint(
+                  painter: SketchPainter(
+                    sketches: sketches,
+                      backgroundImage: backgroundImage.value,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

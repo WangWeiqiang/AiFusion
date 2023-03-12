@@ -1,9 +1,7 @@
 import 'package:aifusion/providers/model_provider.dart';
 import 'package:aifusion/providers/txt2img_provider.dart';
 import 'package:aifusion/screens/chat_screen.dart';
-import 'package:aifusion/screens/drawing_canvas.dart';
 import 'package:aifusion/screens/drawing_screen.dart';
-import 'package:aifusion/screens/paint_screen.dart';
 import 'package:aifusion/screens/stability_screen.dart';
 import 'package:aifusion/screens/supper_resolution_screen.dart';
 import 'package:aifusion/services/services.dart';
@@ -58,16 +56,17 @@ class MyApp extends StatelessWidget {
                   Tab(icon:Icon(Icons.chat)),
                   Tab(icon:Icon(Icons.image)),
                   Tab(icon: Icon(Icons.scale_sharp)),
-                  Tab(icon:Icon(Icons.play_arrow))
+                  Tab(icon:Icon(Icons.draw_rounded))
                 ]
               ),
             ),
             body: const TabBarView(
+              physics: NeverScrollableScrollPhysics(),
               children: [
                 ChatScreen(),
                 SingleImagePage(),
                 SupperResolutionPage(),
-                DrawingPage()
+                DrawingScreen()
               ],
             ) ,
           ),

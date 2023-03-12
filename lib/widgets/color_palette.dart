@@ -42,8 +42,8 @@ class ColorPalette extends HookWidget {
                           color: selectedColor.value == color
                               ? Colors.blue
                               : Colors.grey,
-                          width: 1.5),
-                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                          width:selectedColor.value==color? 2: 0),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
                     ),
                   ),
                 ),
@@ -54,16 +54,7 @@ class ColorPalette extends HookWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: selectedColor.value,
-                border: Border.all(color: Colors.blue, width: 1.5),
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-              ),
-            ),
-            const SizedBox(width: 10),
+            
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
@@ -71,7 +62,7 @@ class ColorPalette extends HookWidget {
                   showColorWheel(context, selectedColor);
                 },
                 child: SvgPicture.asset(
-                  'assets/svgs/color_wheel.svg',
+                  'assets/images/color_wheel.svg',
                   height: 30,
                   width: 30,
                 ),

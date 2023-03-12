@@ -56,6 +56,7 @@ dependencies:
   font_awesome_flutter: ^10.2.1
   url_launcher: ^6.1.6
   universal_html: ^2.0.8
+  floating_action_bubble: ^1.1.4
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +82,9 @@ flutter:
     - assets/images/openai_logo.jpg
     - assets/images/person.png
     - assets/images/icon_txttoimg.png
+    - assets/images/color_wheel.svg
+    - assets/images/icon_fill_no.png
+    - assets/images/icon_fill_yes.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

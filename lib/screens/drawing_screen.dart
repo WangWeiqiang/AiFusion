@@ -55,29 +55,29 @@ class DrawingScreen extends HookWidget {
     ];
 
     showColorWheel(BuildContext context, ValueNotifier<Color> color) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Pick a color!'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: color.value,
-              onColorChanged: (value) {
-                color.value = value;
-              },
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Pick a color!'),
+            content: SingleChildScrollView(
+              child: ColorPicker(
+                pickerColor: color.value,
+                onColorChanged: (value) {
+                  color.value = value;
+                },
+              ),
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Done'),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        );
-      },
-    );
-  }
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Done'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     IconData CurrentDrawIcon(DrawingMode drawingMode){
       switch(drawingMode){
@@ -97,101 +97,18 @@ class DrawingScreen extends HookWidget {
 
       return FontAwesomeIcons.pencil;
     }
-    return Scaffold(
-      body: SafeArea(
-        child:Column(
-          children:[
-            Container(
-              color: kCanvasColor,
-              //width: double.maxFinite,
-              //height: double.maxFinite,
-              child: DrawingCanvas(
-                width: 300,//MediaQuery.of(context).size.width,
-                height: 200,// MediaQuery.of(context).size.height,
-                drawingMode: drawingMode,
-                selectedColor: selectedColor,
-                strokeSize: strokeSize,
-                eraserSize: eraserSize,
-                sideBarController: animationController,
-                currentSketch: currentSketch,
-                allSketches: allSketches,
-                canvasGlobalKey: canvasGlobalKey,
-                filled: filled,
-                polygonSides: polygonSides,
-                backgroundImage: backgroundImage,
-              ),
-            ),
-            
-            Expanded(child: Align(alignment: FractionalOffset.bottomCenter,
-              heightFactor: 100,
-              child: Column(
-                children: [
-                  //stroke size setting
-                  Visibility(
-                    visible: showSize.value,
-                    child:
-                          Slider(
-                            value: strokeSize.value,
-                            min: 0,
-                            max: 50,
-                            onChanged: (val) {
-                              strokeSize.value = val;
-                              eraserSize.value = val;
-                            },
-                          )
-                  ),
-                
-                  //color settings
-                  Visibility(
-                  visible: showColorSetting.value,
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 2,
-                    runSpacing: 2,
-                    children: [
-                      for (Color color in colors)
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () => selectedColor.value = color,
-                            child: Container(
-                              height: 25,
-                              width: 25,
-                              decoration: BoxDecoration(
-                                color: color,
-                                border: Border.all(
-                                    color: selectedColor.value == color
-                                        ? Colors.blue
-                                        : Colors.grey,
-                                    width:selectedColor.value==color? 2: 0),
-                                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () {
-                              showColorWheel(context, selectedColor);
-                            },
-                            child: SvgPicture.asset(
-                              'assets/images/color_wheel.svg',
-                              height: 30,
-                              width: 30,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  
-                ),
-                
-                  //paint tools
-                  Visibility(
-                    visible: showPaintToolSetting.value,
-                    child:Wrap(
+    
+    void _showPaintTool(BuildContext context){
+      showModalBottomSheet(
+        elevation: 10,
+        backgroundColor: cardColor,
+        context:context,
+        builder: (context) =>Container(
+          width: 300,
+          height: 250,
+          color: Colors.white,
+          alignment: Alignment.center,
+          child:Wrap(
                       alignment: WrapAlignment.start,
                       spacing: 5,
                       runSpacing: 5,
@@ -244,10 +161,111 @@ class DrawingScreen extends HookWidget {
                           tooltip: 'Circle',
                         ),
                       ],
-                    ),
+                    )
+        ));
+    }
+    void _showPaintSize(BuildContext context){
+      
+      showModalBottomSheet(
+        elevation: 10,
+        context: context, 
+        backgroundColor: cardColor,
+        builder: (context)=>Container(
+          width: 300,
+          height: 250,
+          color: cardColor,
+          alignment: Alignment.center,
+          child:  Slider(
+              value: strokeSize.value,
+              min: 0,
+              max: 50,
+              onChanged: (val) {
+                strokeSize.value = val;
+                eraserSize.value = val;
+              },)
+        ));
+    }
+    void _showColorSettings(BuildContext context){
+      showModalBottomSheet(
+        context: context, 
+        elevation: 10,
+        backgroundColor:cardColor,
+        builder: (context)=>Container(
+          width: 300,
+          height: 250,
+          child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 2,
+                    runSpacing: 2,
+                    children: [
+                      for (Color color in colors)
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => selectedColor.value = color,
+                            child: Container(
+                              height: 25,
+                              width: 25,
+                              decoration: BoxDecoration(
+                                color: color,
+                                border: Border.all(
+                                    color: selectedColor.value == color
+                                        ? Colors.blue
+                                        : Colors.grey,
+                                    width:selectedColor.value==color? 2: 0),
+                                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              showColorWheel(context, selectedColor);
+                            },
+                            child: SvgPicture.asset(
+                              'assets/images/color_wheel.svg',
+                              height: 30,
+                              width: 30,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                  
-                  Material(
+      ));
+    }
+    return Scaffold(
+      body: SafeArea(
+        child:Column(
+          children:[
+            Container(
+              color: kCanvasColor,
+              //width: double.maxFinite,
+              //height: double.maxFinite,
+              child: DrawingCanvas(
+                width: 300,//MediaQuery.of(context).size.width,
+                height: 200,// MediaQuery.of(context).size.height,
+                drawingMode: drawingMode,
+                selectedColor: selectedColor,
+                strokeSize: strokeSize,
+                eraserSize: eraserSize,
+                sideBarController: animationController,
+                currentSketch: currentSketch,
+                allSketches: allSketches,
+                canvasGlobalKey: canvasGlobalKey,
+                filled: filled,
+                polygonSides: polygonSides,
+                backgroundImage: backgroundImage,
+              ),
+            ),
+            
+            Expanded(
+              child: Align(
+                alignment: FractionalOffset.bottomCenter,
+                heightFactor: 100,
+                child: Material(
                     color: cardColor,
                     child: Padding(
                       padding: const EdgeInsets.all(5),
@@ -259,7 +277,7 @@ class DrawingScreen extends HookWidget {
                           _IconBox(
                             iconData: CurrentDrawIcon(drawingMode.value),                   
                             selected: true,
-                            onTap: () => {showPaintToolSetting.value=!showPaintToolSetting.value},
+                            onTap: () => {_showPaintTool(context)},
                             tooltip: 'Pencil',
                           ),
                         const SizedBox(width: 10,),
@@ -278,7 +296,7 @@ class DrawingScreen extends HookWidget {
                         
                         //stroke size
                         GestureDetector(
-                          onTap: ()=>{showSize.value=!showSize.value},
+                          onTap: ()=>{_showPaintSize(context)},
                           child: Container(
 
                             width: 35,
@@ -351,7 +369,7 @@ class DrawingScreen extends HookWidget {
                         
                         //color
                         GestureDetector(
-                          onTap: ()=>{showColorSetting.value=!showColorSetting.value},
+                          onTap: ()=>{_showColorSettings(context)},
                           child: SizedBox(
                             width: 35,
                             height: 35,
@@ -390,9 +408,9 @@ class DrawingScreen extends HookWidget {
                   ),
                 
                   ),
-                ],
+              
               )
-            )),
+            ),
             
           ],
         ),

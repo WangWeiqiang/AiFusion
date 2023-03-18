@@ -27,10 +27,7 @@ class DrawingScreen extends HookWidget {
     final filled = useState<bool>(false);
     final polygonSides = useState<int>(3);
     final backgroundImage = useState<Image?>(null);
-    final showSize = useState<bool>(false);
-    final showColorSetting = useState<bool>(false);
-    final showPaintToolSetting = useState<bool>(false);
-
+  
     final canvasGlobalKey = GlobalKey();
     ValueNotifier<Sketch?> currentSketch = useState(null);
     ValueNotifier<List<Sketch>> allSketches = useState([]);
@@ -81,6 +78,8 @@ class DrawingScreen extends HookWidget {
 
     IconData CurrentDrawIcon(DrawingMode drawingMode){
       switch(drawingMode){
+        case DrawingMode.fill:
+          return FontAwesomeIcons.fillDrip;
         case DrawingMode.pencil:
           return FontAwesomeIcons.pencil;
         case DrawingMode.line:
@@ -104,64 +103,69 @@ class DrawingScreen extends HookWidget {
         backgroundColor: cardColor,
         context:context,
         builder: (context) =>Container(
-          width: 300,
-          height: 250,
+          height: 80,
           color: Colors.white,
           alignment: Alignment.center,
           child:Wrap(
-                      alignment: WrapAlignment.start,
-                      spacing: 5,
-                      runSpacing: 5,
-                      children: [
-                        _IconBox(
-                          iconData: FontAwesomeIcons.pencil,
-                          selected: drawingMode.value == DrawingMode.pencil,
-                          onTap: () => drawingMode.value = DrawingMode.pencil,
-                          tooltip: 'Pencil',
-                        ),
-                        _IconBox(
-                          selected: drawingMode.value == DrawingMode.line,
-                          onTap: () => drawingMode.value = DrawingMode.line,
-                          tooltip: 'Line',
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 22,
-                                height: 2,
-                                color: drawingMode.value == DrawingMode.line
-                                    ? Colors.grey[900]
-                                    : Colors.grey,
-                              ),
-                            ],
-                          ),
-                        ),
-                        _IconBox(
-                          iconData: Icons.hexagon_outlined,
-                          selected: drawingMode.value == DrawingMode.polygon,
-                          onTap: () => drawingMode.value = DrawingMode.polygon,
-                          tooltip: 'Polygon',
-                        ),
-                        _IconBox(
-                          iconData: FontAwesomeIcons.eraser,
-                          selected: drawingMode.value == DrawingMode.eraser,
-                          onTap: () => drawingMode.value = DrawingMode.eraser,
-                          tooltip: 'Eraser',
-                        ),
-                        _IconBox(
-                          iconData: FontAwesomeIcons.square,
-                          selected: drawingMode.value == DrawingMode.square,
-                          onTap: () => drawingMode.value = DrawingMode.square,
-                          tooltip: 'Square',
-                        ),
-                        _IconBox(
-                          iconData: FontAwesomeIcons.circle,
-                          selected: drawingMode.value == DrawingMode.circle,
-                          onTap: () => drawingMode.value = DrawingMode.circle,
-                          tooltip: 'Circle',
-                        ),
-                      ],
-                    )
+            alignment: WrapAlignment.start,
+            spacing: 5,
+            runSpacing: 5,
+            children: [
+              _IconBox(
+                iconData: FontAwesomeIcons.pencil,
+                selected: drawingMode.value == DrawingMode.pencil,
+                onTap: () => drawingMode.value = DrawingMode.pencil,
+                tooltip: 'Pencil',
+              ),
+              _IconBox(
+                iconData: FontAwesomeIcons.fillDrip,
+                selected: drawingMode.value == DrawingMode.fill,
+                onTap: () => drawingMode.value = DrawingMode.fill,
+                tooltip: 'Fill',
+              ),
+              _IconBox(
+                selected: drawingMode.value == DrawingMode.line,
+                onTap: () => drawingMode.value = DrawingMode.line,
+                tooltip: 'Line',
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 22,
+                      height: 2,
+                      color: drawingMode.value == DrawingMode.line
+                          ? Colors.grey[900]
+                          : Colors.grey,
+                    ),
+                  ],
+                ),
+              ),
+              _IconBox(
+                iconData: Icons.hexagon_outlined,
+                selected: drawingMode.value == DrawingMode.polygon,
+                onTap: () => drawingMode.value = DrawingMode.polygon,
+                tooltip: 'Polygon',
+              ),
+              _IconBox(
+                iconData: FontAwesomeIcons.eraser,
+                selected: drawingMode.value == DrawingMode.eraser,
+                onTap: () => drawingMode.value = DrawingMode.eraser,
+                tooltip: 'Eraser',
+              ),
+              _IconBox(
+                iconData: FontAwesomeIcons.square,
+                selected: drawingMode.value == DrawingMode.square,
+                onTap: () => drawingMode.value = DrawingMode.square,
+                tooltip: 'Square',
+              ),
+              _IconBox(
+                iconData: FontAwesomeIcons.circle,
+                selected: drawingMode.value == DrawingMode.circle,
+                onTap: () => drawingMode.value = DrawingMode.circle,
+                tooltip: 'Circle',
+              ),
+            ],
+          )
         ));
     }
     void _showPaintSize(BuildContext context){
@@ -171,18 +175,50 @@ class DrawingScreen extends HookWidget {
         context: context, 
         backgroundColor: cardColor,
         builder: (context)=>Container(
-          width: 300,
-          height: 250,
+          //width: 300,
+          height: 130,
           color: cardColor,
+          padding: EdgeInsets.all(20),
           alignment: Alignment.center,
-          child:  Slider(
-              value: strokeSize.value,
-              min: 0,
-              max: 50,
-              onChanged: (val) {
-                strokeSize.value = val;
-                eraserSize.value = val;
-              },)
+          child:Column(
+            children: [
+              Text("Strok size"),
+              Row(children: [
+                Container(
+                  width: 35,
+                  height: 35,
+                  decoration: const ShapeDecoration(
+                    color: Colors.white,
+                    shape: CircleBorder(side:BorderSide(color: Colors.black,width: 0.5)),
+                    
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: strokeSize.value,
+                      height: strokeSize.value,
+                      
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius:BorderRadius.all(Radius.circular(20))
+                        )
+                      ),
+                    )
+                  ), 
+                ),
+                Expanded(child: 
+                  Slider(
+                    value: strokeSize.value,
+                    min: 0,
+                    max: 50,
+                    onChanged: (val) {
+                      strokeSize.value = val;
+                      eraserSize.value = val;
+                    },)
+                  )
+                ],)
+              ]
+          )
         ));
     }
     void _showColorSettings(BuildContext context){
@@ -191,8 +227,8 @@ class DrawingScreen extends HookWidget {
         elevation: 10,
         backgroundColor:cardColor,
         builder: (context)=>Container(
-          width: 300,
-          height: 250,
+          padding: EdgeInsets.all(20),
+          height: 100,
           child: Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 2,
@@ -225,28 +261,44 @@ class DrawingScreen extends HookWidget {
                             onTap: () {
                               showColorWheel(context, selectedColor);
                             },
-                            child: SvgPicture.asset(
-                              'assets/images/color_wheel.svg',
-                              height: 30,
-                              width: 30,
+                            child: Container(
+                              height: 25,
+                              width: 25,
+                              decoration: BoxDecoration(
+                                color: selectedColor.value,
+                                
+                                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/images/color_wheel.svg',
+                                height: 30,
+                                width: 30,
+                                
+                              ),
                             ),
+                            
+                            
                           ),
                         ),
                     ],
                   ),
       ));
     }
+    
     return Scaffold(
       body: SafeArea(
+        
         child:Column(
+          
           children:[
             Container(
-              color: kCanvasColor,
+              
+              color: cardColor,
               //width: double.maxFinite,
               //height: double.maxFinite,
               child: DrawingCanvas(
-                width: 300,//MediaQuery.of(context).size.width,
-                height: 200,// MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height-250,
                 drawingMode: drawingMode,
                 selectedColor: selectedColor,
                 strokeSize: strokeSize,
@@ -264,7 +316,6 @@ class DrawingScreen extends HookWidget {
             Expanded(
               child: Align(
                 alignment: FractionalOffset.bottomCenter,
-                heightFactor: 100,
                 child: Material(
                     color: cardColor,
                     child: Padding(
@@ -273,6 +324,22 @@ class DrawingScreen extends HookWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+
+                          //color
+                        GestureDetector(
+                          onTap: ()=>{_showColorSettings(context)},
+                          child: SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: selectedColor.value,
+                                borderRadius:BorderRadius.all(Radius.circular(20))
+                              )
+                            ),
+                          )
+                        ),
+                        SizedBox(width: 10,),
                           //drawing tools
                           _IconBox(
                             iconData: CurrentDrawIcon(drawingMode.value),                   
@@ -324,6 +391,17 @@ class DrawingScreen extends HookWidget {
 
                         const SizedBox(width: 10,),
 
+                         //clear
+                        _IconBox(
+                          iconData: FontAwesomeIcons.xmark,                   
+                          selected: true,
+                          onTap: () => undoRedoStack.value.clear(),
+                          tooltip: "magic",
+                        ),
+
+                        SizedBox(width: 10,),
+                        
+
                         //undo
                         _IconBox(
                               iconData: FontAwesomeIcons.arrowRotateLeft,                   
@@ -357,31 +435,8 @@ class DrawingScreen extends HookWidget {
                         ),
                         SizedBox(width: 10,),
                         
-                        //clear
-                        _IconBox(
-                          iconData: FontAwesomeIcons.xmark,                   
-                          selected: true,
-                          onTap: () => undoRedoStack.value.clear(),
-                          tooltip: "magic",
-                        ),
-
-                        SizedBox(width: 10,),
+                       
                         
-                        //color
-                        GestureDetector(
-                          onTap: ()=>{_showColorSettings(context)},
-                          child: SizedBox(
-                            width: 35,
-                            height: 35,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: selectedColor.value,
-                                borderRadius:BorderRadius.all(Radius.circular(20))
-                              )
-                            ),
-                          )
-                        ),
-                        SizedBox(width: 10,),
                         
                         //export iamge
                         _IconBox(

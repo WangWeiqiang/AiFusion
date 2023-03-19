@@ -108,7 +108,7 @@ class _SupperResolutionPageState extends State<SupperResolutionPage> {
                         _image = imgFile.path;
                       });
 
-                      String? reqeustId = await ReplicateService.SupperResolution(modelType: '', fileName: imgFile.name, bodyBytes: imageBytes);
+                      String? reqeustId = await ReplicateService.SupperResolution(fileName: imgFile.name, bodyBytes: imageBytes);
 
                       _timer = Timer.periodic(duration, (timer) async { 
                         var output = await ReplicateService.GetSuppResolutionResult(id: reqeustId!);

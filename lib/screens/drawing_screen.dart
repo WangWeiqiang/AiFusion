@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:typed_data';
 import 'dart:ui';
-
+import 'dart:ui' as ui;
 import 'package:aifusion/services/assets_manager.dart';
 import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/rendering.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/constants.dart';
 import '../models/drawing_model.dart';
 import '../models/sketch.dart';
+import '../services/replicate_service.dart';
 import '../widgets/canvas_side_bar.dart';
 import 'drawing_canvas.dart';
 import '../widgets/iconbox_widget.dart';
@@ -27,7 +31,9 @@ class DrawingScreen extends HookWidget {
     final filled = useState<bool>(false);
     final polygonSides = useState<int>(3);
     final backgroundImage = useState<Image?>(null);
-  
+    var isLoading=false;
+    final Duration duration = Duration(seconds: 3);
+    int maxLoadTimes=20;
     final canvasGlobalKey = GlobalKey();
     ValueNotifier<Sketch?> currentSketch = useState(null);
     ValueNotifier<List<Sketch>> allSketches = useState([]);
@@ -97,6 +103,15 @@ class DrawingScreen extends HookWidget {
       return FontAwesomeIcons.pencil;
     }
     
+    Future<Uint8List?> getBytes() async {
+      RenderRepaintBoundary boundary = canvasGlobalKey.currentContext
+          ?.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List? pngBytes = byteData?.buffer.asUint8List();
+      return pngBytes;
+  }
+
     void _showPaintTool(BuildContext context){
       showModalBottomSheet(
         elevation: 10,
@@ -284,7 +299,7 @@ class DrawingScreen extends HookWidget {
                   ),
       ));
     }
-    
+
     return Scaffold(
       body: SafeArea(
         
@@ -317,15 +332,14 @@ class DrawingScreen extends HookWidget {
               child: Align(
                 alignment: FractionalOffset.bottomCenter,
                 child: Material(
-                    color: cardColor,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5),
+                  color: cardColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
                   
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-
-                          //color
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //color
                         GestureDetector(
                           onTap: ()=>{_showColorSettings(context)},
                           child: SizedBox(
@@ -340,79 +354,78 @@ class DrawingScreen extends HookWidget {
                           )
                         ),
                         SizedBox(width: 10,),
-                          //drawing tools
-                          _IconBox(
-                            iconData: CurrentDrawIcon(drawingMode.value),                   
-                            selected: true,
-                            onTap: () => {_showPaintTool(context)},
-                            tooltip: 'Pencil',
-                          ),
+                        //drawing tools
+                        _IconBox(
+                          iconData: CurrentDrawIcon(drawingMode.value),                   
+                          selected: true,
+                          onTap: () => {_showPaintTool(context)},
+                          tooltip: 'Pencil',
+                        ),
                         const SizedBox(width: 10,),
-                        
+                      
                         //stroke fill or not
                         MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: ()=> filled.value=!filled.value ,
-                            child: ImageIcon(AssetImage(filled.value?AssetsManager.drawFillYes:AssetsManager.drawFillNo)),
-                            
-                          ),
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: ()=> filled.value=!filled.value ,
+                          child: ImageIcon(AssetImage(filled.value?AssetsManager.drawFillYes:AssetsManager.drawFillNo)),
+                          
                         ),
+                      ),
 
                         const SizedBox(width: 10,),
                         
                         //stroke size
                         GestureDetector(
-                          onTap: ()=>{_showPaintSize(context)},
-                          child: Container(
+                        onTap: ()=>{_showPaintSize(context)},
+                        child: Container(
 
-                            width: 35,
-                            height: 35,
-                            decoration: const ShapeDecoration(
-                              color: Colors.white,
-                              shape: CircleBorder(side:BorderSide(color: Colors.black,width: 0.5)),
-                              
-                            ),
-                            child: Center(
-                              child: SizedBox(
-                                width: strokeSize.value,
-                                height: strokeSize.value,
-                                
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius:BorderRadius.all(Radius.circular(20))
-                                  )
-                                ),
-                              )
-                            ), 
+                          width: 35,
+                          height: 35,
+                          decoration: const ShapeDecoration(
+                            color: Colors.white,
+                            shape: CircleBorder(side:BorderSide(color: Colors.black,width: 0.5)),
+                            
                           ),
+                          child: Center(
+                            child: SizedBox(
+                              width: strokeSize.value,
+                              height: strokeSize.value,
+                              
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius:BorderRadius.all(Radius.circular(20))
+                                )
+                              ),
+                            )
+                          ), 
                         ),
+                      ),
 
                         const SizedBox(width: 10,),
 
-                         //clear
+                        //clear
                         _IconBox(
-                          iconData: FontAwesomeIcons.xmark,                   
-                          selected: true,
-                          onTap: () => undoRedoStack.value.clear(),
-                          tooltip: "magic",
-                        ),
+                        iconData: FontAwesomeIcons.xmark,                   
+                        selected: true,
+                        onTap: () => undoRedoStack.value.clear(),
+                        tooltip: "magic",
+                      ),
 
                         SizedBox(width: 10,),
-                        
-
+                      
                         //undo
                         _IconBox(
-                              iconData: FontAwesomeIcons.arrowRotateLeft,                   
-                              selected: true,
-                              onTap: ()=>{
-                                if(allSketches.value.isNotEmpty){
-                                  undoRedoStack.value.undo()
+                          iconData: FontAwesomeIcons.arrowRotateLeft,                   
+                          selected: true,
+                          onTap: ()=>{
+                            if(allSketches.value.isNotEmpty){
+                              undoRedoStack.value.undo()
 
-                                }
-                              },
-                              tooltip: "undo",
+                            }
+                          },
+                          tooltip: "undo",
                         ),
                         SizedBox(width: 10,),
                         
@@ -434,10 +447,7 @@ class DrawingScreen extends HookWidget {
                           },
                         ),
                         SizedBox(width: 10,),
-                        
-                       
-                        
-                        
+                      
                         //export iamge
                         _IconBox(
                           iconData: FontAwesomeIcons.download,                   
@@ -448,25 +458,49 @@ class DrawingScreen extends HookWidget {
                           tooltip: "export",
                         ),
                         SizedBox(width: 10,),
-                        
+                      
                         //image to image action
                         _IconBox(
                           iconData: FontAwesomeIcons.lightbulb,                   
                           selected: true,
-                          onTap: () => {},
-                          tooltip: "magic",
-                      
-                    ),
-                      
+                          onTap: () async {
+                            isLoading=true;
+                            Uint8List? pngBytes = await getBytes();
+                            String? reqeustId = await ReplicateService.Image2Image(fileName: 'temp.png', bodyByte: pngBytes, n_prompt: '', prompt: '');
+                            Timer? _timer =null;   
+                            _timer = Timer.periodic(
+                                  duration, (timer) async { 
+                                    var output = await ReplicateService.GetSuppResolutionResult(id: reqeustId!);
+                                    log(maxLoadTimes.toString());
+                                    if(output!=null){
+                                      isLoading=false;
+                                      _timer!.cancel();
+                                      
+                                      log(output);
+                                      
+                                    }
+                                    maxLoadTimes--;
+                                    if(maxLoadTimes<0 && _timer!=null){
+                                     
+                                        isLoading=false;
+                                      
+                                      _timer!.cancel();
+                                      log("wait for long time no response from replciate");
+                                    }
+                                  }
+                                );
+                            
+                          },
+                          tooltip: 'MAGIC',
+                        ),
                       ]
                     )
                   ),
                 
-                  ),
+                ),
               
               )
-            ),
-            
+            ),           
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
@@ -148,11 +149,14 @@ class DrawingCanvas extends HookWidget {
       ),
     );
   }
+
+
 }
 
 class SketchPainter extends CustomPainter {
   final List<Sketch> sketches;
   final Image? backgroundImage;
+  
 
   const SketchPainter({
     Key? key,
@@ -162,6 +166,7 @@ class SketchPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+  
     if (backgroundImage != null) {
       canvas.drawImageRect(
         backgroundImage!,
